@@ -1,28 +1,28 @@
-Name GhostCoin
+Name BottleCaps
 
 RequestExecutionLevel highest
 SetCompressor /SOLID lzma
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 1.0.0.0
-!define COMPANY "GhostCoin project"
-!define URL http://ghostcoin.org
+!define VERSION 0.3.0
+!define COMPANY "BottleCaps project"
+!define URL http://
 
 # MUI Symbol Definitions
-!define MUI_ICON "..\share\pixmaps\favicon.ico"
-!define MUI_WELCOMEFINISHPAGE_BITMAP "..\share\pixmaps\nsis-wizard.bmp"
+!define MUI_ICON "../share/pixmaps/BottleCaps.ico"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "../share/pixmaps/nsis-wizard.bmp"
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_RIGHT
-!define MUI_HEADERIMAGE_BITMAP "..\share\pixmaps\nsis-header.bmp"
+!define MUI_HEADERIMAGE_BITMAP "../share/pixmaps/nsis-header.bmp"
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT HKLM
 !define MUI_STARTMENUPAGE_REGISTRY_KEY ${REGKEY}
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME StartMenuGroup
-!define MUI_STARTMENUPAGE_DEFAULTFOLDER GhostCoin
-!define MUI_FINISHPAGE_RUN $INSTDIR\ghostcoin-qt.exe
+!define MUI_STARTMENUPAGE_DEFAULTFOLDER BottleCaps
+!define MUI_FINISHPAGE_RUN $INSTDIR\BottleCaps-qt.exe
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
-!define MUI_UNWELCOMEFINISHPAGE_BITMAP "..\share\pixmaps\nsis-wizard.bmp"
+!define MUI_UNWELCOMEFINISHPAGE_BITMAP "../share/pixmaps/nsis-wizard.bmp"
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
 # Included files
@@ -45,14 +45,14 @@ Var StartMenuGroup
 !insertmacro MUI_LANGUAGE English
 
 # Installer attributes
-OutFile ghostcoin-${VERSION}-win32-setup.exe
-InstallDir $PROGRAMFILES\GhostCoin
+OutFile BottleCaps-0.3.0-win32-setup.exe
+InstallDir $PROGRAMFILES\BottleCaps
 CRCCheck on
 XPStyle on
 BrandingText " "
 ShowInstDetails show
-VIProductVersion ${VERSION}
-VIAddVersionKey ProductName GhostCoin
+VIProductVersion 0.3.0.0
+VIAddVersionKey ProductName BottleCaps
 VIAddVersionKey ProductVersion "${VERSION}"
 VIAddVersionKey CompanyName "${COMPANY}"
 VIAddVersionKey CompanyWebsite "${URL}"
@@ -66,16 +66,19 @@ ShowUninstDetails show
 Section -Main SEC0000
     SetOutPath $INSTDIR
     SetOverwrite on
-    File ..\release\ghostcoin-qt.exe
-    File /oname=license.txt ..\COPYING
-    File /oname=readme.txt ..\doc\README_windows.txt
-    #SetOutPath $INSTDIR\daemon
-    #File ..\src\novacoind.exe
+    File ../release/BottleCaps-qt.exe
+    File /oname=license.txt ../COPYING
+    File /oname=readme.txt ../doc/README_windows.txt
+    SetOutPath $INSTDIR\daemon
+    File ../src/BottleCapsd.exe
     SetOutPath $INSTDIR\src
-    File /r /x *.exe /x *.o ..\src\*.*
+    File /r /x *.exe /x *.o ../src\*.*
     SetOutPath $INSTDIR
     WriteRegStr HKCU "${REGKEY}\Components" Main 1
 
+    # Remove old wxwidgets-based-BottleCaps executable and locales:
+    Delete /REBOOTOK $INSTDIR\BottleCaps.exe
+    RMDir /r /REBOOTOK $INSTDIR\locale
 SectionEnd
 
 Section -post SEC0001
@@ -84,8 +87,8 @@ Section -post SEC0001
     WriteUninstaller $INSTDIR\uninstall.exe
     !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     CreateDirectory $SMPROGRAMS\$StartMenuGroup
-    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\GhostCoin.lnk" $INSTDIR\ghostcoin-qt.exe
-    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Uninstall GhostCoin.lnk" $INSTDIR\uninstall.exe
+    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\BottleCaps.lnk" $INSTDIR\BottleCaps-qt.exe
+    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Uninstall BottleCaps.lnk" $INSTDIR\uninstall.exe
     !insertmacro MUI_STARTMENU_WRITE_END
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" DisplayName "$(^Name)"
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" DisplayVersion "${VERSION}"
@@ -95,11 +98,12 @@ Section -post SEC0001
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" UninstallString $INSTDIR\uninstall.exe
     WriteRegDWORD HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" NoModify 1
     WriteRegDWORD HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" NoRepair 1
-    WriteRegStr HKCR "ghostcoin" "URL Protocol" ""
-    WriteRegStr HKCR "ghostcoin" "" "URL:Litecoin"
-    WriteRegStr HKCR "ghostcoin\DefaultIcon" "" $INSTDIR\ghostcoin-qt.exe
-    WriteRegStr HKCR "ghostcoin\shell\open\command" "" '"$INSTDIR\ghostcoin-qt.exe" "%1"'
 
+    # BottleCaps: URI handling disabled for 0.6.0
+        WriteRegStr HKCR "BottleCaps" "URL Protocol" ""
+        WriteRegStr HKCR "BottleCaps" "" "URL:BottleCaps"
+        WriteRegStr HKCR "BottleCaps\DefaultIcon" "" $INSTDIR\BottleCaps-qt.exe
+        WriteRegStr HKCR "BottleCaps\shell\open\command" "" '"$INSTDIR\BottleCaps-qt.exe" "$$1"'
 SectionEnd
 
 # Macro for selecting uninstaller sections
@@ -117,19 +121,19 @@ done${UNSECTION_ID}:
 
 # Uninstaller sections
 Section /o -un.Main UNSEC0000
-    Delete /REBOOTOK $INSTDIR\ghostcoin-qt.exe
+    Delete /REBOOTOK $INSTDIR\BottleCaps-qt.exe
     Delete /REBOOTOK $INSTDIR\license.txt
     Delete /REBOOTOK $INSTDIR\readme.txt
-    #RMDir /r /REBOOTOK $INSTDIR\daemon
+    RMDir /r /REBOOTOK $INSTDIR\daemon
     RMDir /r /REBOOTOK $INSTDIR\src
     DeleteRegValue HKCU "${REGKEY}\Components" Main
 SectionEnd
 
 Section -un.post UNSEC0001
     DeleteRegKey HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
-    Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Uninstall GhostCoin.lnk"
-    Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\GhostCoin.lnk"
-    Delete /REBOOTOK "$SMSTARTUP\GhostCoin.lnk"
+    Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Uninstall BottleCaps.lnk"
+    Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\BottleCaps.lnk"
+    Delete /REBOOTOK "$SMSTARTUP\BottleCaps.lnk"
     Delete /REBOOTOK $INSTDIR\uninstall.exe
     Delete /REBOOTOK $INSTDIR\debug.log
     Delete /REBOOTOK $INSTDIR\db.log
@@ -137,7 +141,7 @@ Section -un.post UNSEC0001
     DeleteRegValue HKCU "${REGKEY}" Path
     DeleteRegKey /IfEmpty HKCU "${REGKEY}\Components"
     DeleteRegKey /IfEmpty HKCU "${REGKEY}"
-    DeleteRegKey HKCR "ghostcoin"
+    DeleteRegKey HKCR "BottleCaps"
     RmDir /REBOOTOK $SMPROGRAMS\$StartMenuGroup
     RmDir /REBOOTOK $INSTDIR
     Push $R0

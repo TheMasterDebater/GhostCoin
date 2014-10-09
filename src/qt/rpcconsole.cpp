@@ -312,7 +312,7 @@ void RPCConsole::clear()
                 "b { color: #006060; } "
                 );
 
-    message(CMD_REPLY, (tr("Welcome to the GhostCoin RPC console.") + "<br>" +
+    message(CMD_REPLY, (tr("Welcome to the Badgercoin RPC console.") + "<br>" +
                         tr("Use up and down arrows to navigate history, and <b>Ctrl-L</b> to clear screen.") + "<br>" +
                         tr("Type <b>help</b> for an overview of available commands.")), true);
 }
@@ -359,8 +359,8 @@ void RPCConsole::on_lineEdit_returnPressed()
     {
         message(CMD_REQUEST, cmd);
         emit cmdRequest(cmd);
-        // Remove command, if already in history
-        history.removeOne(cmd);
+        // Truncate history from current position
+        history.erase(history.begin() + historyPtr, history.end());
         // Append command to history
         history.append(cmd);
         // Enforce maximum history size
